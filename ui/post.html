@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post — Post Pulse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>tailwind.config = { theme: { fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] } } }</script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="/static/app.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gray-950 text-gray-100 antialiased font-sans">
+
+  <!-- Nav -->
+  <nav class="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-6 h-14 flex items-center gap-2">
+      <a href="/landing.html" class="font-semibold text-base text-white mr-auto tracking-tight">Post Pulse</a>
+      <a href="/index.html" class="text-sm text-gray-400 hover:text-gray-200 px-3 py-1.5 rounded-md hover:bg-gray-800 transition-colors">Dashboard</a>
+      <a href="/settings.html" class="text-sm text-gray-400 hover:text-gray-200 px-3 py-1.5 rounded-md hover:bg-gray-800 transition-colors">Settings</a>
+    </div>
+  </nav>
+
+  <main class="max-w-3xl mx-auto px-6 py-8" x-data="postDetail()" x-init="init()">
+
+    <!-- Loading -->
+    <div x-show="loading" class="flex items-center gap-2 text-gray-500 text-sm py-12 justify-center">
+      <span class="spinner"></span> Loading post…
+    </div>
+
+    <!-- Error -->
+    <div x-show="error && !loading"
+         class="bg-red-950/60 border border-red-800 text-red-400 rounded-xl px-4 py-3 text-sm"
+         x-text="error"></div>
+
+    <template x-if="post && !loading">
+      <div>
+
+        <a href="/index.html"
+           class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-300 transition-colors mb-6">
+          ← Back to Dashboard
+        </a>
+
+        <!-- Metrics card -->
+        <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 mb-4">
+          <div class="flex justify-between items-center mb-5">
+            <span class="text-xs text-gray-500 font-medium" x-text="fmtDate(post.date_iso)"></span>
+            <a :href="post.url" target="_blank" rel="noopener"
+               class="text-xs text-blue-400 hover:text-blue-300 hover:underline font-medium transition-colors">View on LinkedIn ↗</a>
+          </div>
+          <div class="grid grid-cols-3 sm:grid-cols-6 gap-6">
+            <div class="text-center">
+              <div class="text-2xl font-bold text-white tabular-nums" x-text="fmt(post.impressions)"></div>
+              <div class="text-xs text-gray-500 uppercase tracking-wide mt-1">Impressions</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-white tabular-nums" x-text="fmt(post.reactions)"></div>
+              <div class="text-xs text-gray-500 uppercase tracking-wide mt-1">Reactions</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-white tabular-nums" x-text="fmt(post.comments)"></div>
+              <div class="text-xs text-gray-500 uppercase tracking-wide mt-1">Comments</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-white tabular-nums" x-text="fmt(post.reposts)"></div>
+              <div class="text-xs text-gray-500 uppercase tracking-wide mt-1">Reposts</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-white tabular-nums" x-text="fmt(post.profile_viewers)"></div>
+              <div class="text-xs text-gray-500 uppercase tracking-wide mt-1">Profile Views</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-white tabular-nums" x-text="fmt(post.followers_gained)"></div>
+              <div class="text-xs text-gray-500 uppercase tracking-wide mt-1">Followers</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Post content -->
+        <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 mb-4">
+          <h2 class="text-sm font-semibold text-gray-200 mb-3">Post Content</h2>
+          <div class="text-sm leading-relaxed text-gray-300 whitespace-pre-wrap break-words bg-gray-800/60 rounded-lg p-4"
+               x-text="post.content || '(no content)'"></div>
+        </div>
+
+        <!-- AI Feedback -->
+        <div x-show="hasFeedback" class="bg-gray-900 border border-gray-800 rounded-xl p-5 mb-4">
+          <h2 class="text-sm font-semibold text-gray-200 mb-5">AI Feedback</h2>
+
+          <template x-if="hasFeedback">
+            <div class="space-y-5">
+              <div>
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Overall Assessment</p>
+                <p class="text-sm text-gray-300 leading-relaxed" x-text="post.ai_feedback && post.ai_feedback.overall_assessment"></p>
+              </div>
+              <div class="border-t border-gray-800 pt-5">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">What Worked</p>
+                <p class="text-sm text-gray-300 leading-relaxed" x-text="post.ai_feedback && post.ai_feedback.what_worked"></p>
+              </div>
+              <div class="border-t border-gray-800 pt-5">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">What to Improve</p>
+                <p class="text-sm text-gray-300 leading-relaxed" x-text="post.ai_feedback && post.ai_feedback.what_to_improve"></p>
+              </div>
+              <div x-show="post.ai_feedback && post.ai_feedback.rewrite_suggestion"
+                   class="border-t border-gray-800 pt-5">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Rewrite Suggestion</p>
+                <div class="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 text-sm text-gray-300 leading-relaxed whitespace-pre-wrap"
+                     x-text="post.ai_feedback && post.ai_feedback.rewrite_suggestion"></div>
+              </div>
+              <div class="border-t border-gray-800 pt-5">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Key Takeaway</p>
+                <p class="text-sm text-gray-200 leading-relaxed font-medium" x-text="post.ai_feedback && post.ai_feedback.key_takeaway"></p>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <!-- No AI feedback -->
+        <div x-show="!hasFeedback" class="bg-gray-900 border border-gray-800 rounded-xl p-5 mb-4">
+          <h2 class="text-sm font-semibold text-gray-200 mb-2">AI Feedback</h2>
+          <p class="text-sm text-gray-500">No AI feedback for this post. Sync again with AI feedback enabled to generate it.</p>
+        </div>
+
+      </div>
+    </template>
+
+  </main>
+</body>
+</html>

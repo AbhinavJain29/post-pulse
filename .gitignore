@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Post Pulse runtime data
+linkedin_cookies.json
+pipeline_state.json
+tracker.db
+config.json
+
+# Secrets / environment
+.env
+*.env
+
+# Scraped data
+posts_raw.json
+
+# macOS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Claude Code local settings (tool permissions, project-specific config)
+.claude/
+
+# Test artifacts
+.pytest_cache/
+# Leaked MagicMock filenames from tests that patched load() without return_value
+<MagicMock*
+
+# The internal .md files
+CLAUDE.md
+BACKLOG.md
+PRD.md

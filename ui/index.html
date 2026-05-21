@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post Pulse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: { fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] } },
+      safelist: [
+        'border-l-amber-400','border-l-blue-500','border-l-green-500','border-l-red-500',
+        'bg-blue-500','bg-green-500','bg-red-500','bg-amber-400','bg-gray-600',
+        'text-red-400','text-green-400'
+      ]
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="/static/app.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gray-950 text-gray-100 antialiased font-sans">
+
+  <!-- Nav -->
+  <nav class="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-6 h-14 flex items-center gap-2">
+      <a href="/landing.html" class="font-semibold text-base text-white mr-auto tracking-tight">Post Pulse</a>
+      <a href="/index.html" class="text-sm font-medium text-blue-400 px-3 py-1.5 rounded-md bg-blue-500/10">Dashboard</a>
+      <a href="/settings.html" class="text-sm text-gray-400 hover:text-gray-200 px-3 py-1.5 rounded-md hover:bg-gray-800 transition-colors">Settings</a>
+    </div>
+  </nav>
+
+  <main class="max-w-6xl mx-auto px-6 py-8">
+
+    <!-- ── Sync section ── -->
+    <div x-data="syncState()" x-init="null" @destroy="destroy()">
+
+      <!-- Login instruction card -->
+      <div x-show="loginWaiting" x-cloak
+           class="bg-amber-950/60 border border-amber-800/60 rounded-xl px-5 py-4 mb-4">
+        <p class="font-semibold text-amber-300 text-sm mb-1">LinkedIn Login Required</p>
+        <p class="text-amber-400/80 text-xs leading-relaxed">A Chrome window has opened. Please log in to LinkedIn there — Post Pulse will continue automatically once you're signed in.</p>
+      </div>
+
+      <!-- Status panel -->
+      <div x-show="phase !== 'idle'" x-cloak
+           x-transition:leave="panel-fade-leave"
+           x-transition:leave-start="panel-fade-leave-from"
+           x-transition:leave-end="panel-fade-leave-to"
+           class="bg-gray-900 border border-gray-800 border-l-4 rounded-xl px-4 py-3 mb-4"
+           :class="{
+             'border-l-amber-400': phase === 'waiting',
+             'border-l-blue-500':  phase === 'running',
+             'border-l-green-500': phase === 'complete',
+             'border-l-red-500':   phase === 'error'
+           }">
+        <template x-for="evt in events" :key="evt.phase + evt.status">
+          <div class="flex items-center gap-2 py-0.5 text-sm text-gray-300">
+            <span class="w-2 h-2 rounded-full flex-shrink-0"
+              :class="{
+                'bg-blue-500':  evt.status === 'progress',
+                'bg-green-500': evt.status === 'complete',
+                'bg-red-500':   evt.status === 'error',
+                'bg-amber-400': evt.status === 'waiting',
+                'bg-gray-600':  !['progress','complete','error','waiting'].includes(evt.status)
+              }"></span>
+            <span x-text="evt.message"></span>
+          </div>
+        </template>
+        <div x-show="total > 0 && phase === 'running'" class="h-1 bg-gray-800 rounded-full overflow-hidden mt-3 mb-1">
+          <div class="h-full bg-blue-500 transition-all duration-300 ease-out" :style="`width: ${progressPct}%`"></div>
+        </div>
+        <p x-show="phase === 'complete' || phase === 'error'" class="text-xs mt-2 font-medium"
+           :class="phase === 'error' ? 'text-red-400' : 'text-green-400'" x-text="message"></p>
+      </div>
+
+      <!-- Sync button -->
+      <div class="flex items-center gap-3 mb-8">
+        <button class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+                :disabled="isRunning" @click="startSync()">
+          <span x-show="isRunning" class="spinner"></span>
+          <!-- Lucide RotateCw icon -->
+          <svg x-show="!isRunning" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 2v6h-6"/><path d="M21 13a9 9 0 1 1-3-7.7L21 8"/>
+          </svg>
+          <span x-text="isRunning ? 'Syncing…' : 'Sync Now'"></span>
+        </button>
+        <span x-show="phase === 'complete'" class="text-green-400 text-sm font-medium">Sync complete</span>
+        <span x-show="phase === 'error'" class="text-red-400 text-sm" x-text="message"></span>
+      </div>
+
+    </div><!-- end syncState -->
+
+    <!-- ── Posts table ── -->
+    <div x-data="postsTable()" x-init="init()" @sync-complete.window="load()">
+
+      <!-- Header row -->
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h1 class="text-lg font-semibold text-white tracking-tight">Your Posts</h1>
+          <p x-show="!loading && posts.length > 0" class="text-xs text-gray-500 mt-0.5"
+             x-text="`${posts.length} post${posts.length === 1 ? '' : 's'}`"></p>
+        </div>
+        <div x-show="!loading && totalPages > 1" class="flex items-center gap-2">
+          <button class="inline-flex items-center px-3 py-1.5 text-sm border border-gray-700 bg-gray-900 hover:bg-gray-800 text-gray-300 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  :disabled="page === 1" @click="prevPage()">← Prev</button>
+          <span class="text-sm text-gray-500 tabular-nums">
+            <strong class="text-gray-300" x-text="page"></strong>
+            <span class="mx-1">/</span>
+            <strong class="text-gray-300" x-text="totalPages"></strong>
+          </span>
+          <button class="inline-flex items-center px-3 py-1.5 text-sm border border-gray-700 bg-gray-900 hover:bg-gray-800 text-gray-300 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  :disabled="page === totalPages" @click="nextPage()">Next →</button>
+        </div>
+      </div>
+
+      <!-- Skeleton loader -->
+      <div x-show="loading" class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+        <div class="border-b border-gray-800 bg-gray-800/40 px-4 py-3 flex gap-8">
+          <div class="h-3 w-20 bg-gray-700 rounded animate-pulse"></div>
+          <div class="h-3 w-12 bg-gray-700 rounded animate-pulse"></div>
+          <div class="h-3 w-16 bg-gray-700 rounded animate-pulse ml-auto"></div>
+        </div>
+        <template x-for="i in [1,2,3,4,5]" :key="i">
+          <div class="px-4 py-4 border-b border-gray-800/60 flex items-center gap-4 last:border-0">
+            <div class="flex-1 space-y-2">
+              <div class="h-3.5 bg-gray-800 rounded animate-pulse" :style="`width: ${60 + i * 7}%`"></div>
+              <div class="h-2.5 bg-gray-800/70 rounded animate-pulse w-2/3"></div>
+            </div>
+            <div class="flex gap-6 flex-shrink-0">
+              <div class="h-3 w-8 bg-gray-800 rounded animate-pulse"></div>
+              <div class="h-3 w-8 bg-gray-800 rounded animate-pulse"></div>
+              <div class="h-3 w-8 bg-gray-800 rounded animate-pulse"></div>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <!-- Error -->
+      <div x-show="error && !loading"
+           class="bg-red-950/60 border border-red-800 text-red-400 rounded-xl px-4 py-3 text-sm"
+           x-text="error"></div>
+
+      <!-- Empty state -->
+      <div x-show="!loading && !error && posts.length === 0" class="text-center py-24 text-gray-600">
+        <p class="text-4xl mb-4">📭</p>
+        <p class="font-semibold text-gray-400 text-base">No posts yet</p>
+        <p class="text-sm mt-1">Click "Sync Now" to scrape your LinkedIn posts.</p>
+      </div>
+
+      <!-- Table -->
+      <div x-show="!loading && posts.length > 0"
+           class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse">
+            <thead>
+              <tr class="border-b border-gray-800 bg-gray-800/40">
+                <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider w-full">Post</th>
+                <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Date</th>
+                <th class="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider pr-6">Impressions</th>
+                <th class="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Reactions</th>
+                <th class="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Comments</th>
+                <th class="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Reposts</th>
+                <th x-show="aiFeedbackEnabled" class="text-center px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">AI</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800/60">
+              <template x-for="post in pagedPosts" :key="post.url">
+                <tr class="group hover:bg-gray-800/40 transition-colors">
+
+                  <!-- Post preview → links directly to LinkedIn -->
+                  <td class="px-4 py-3 max-w-xs">
+                    <a :href="post.url" target="_blank" rel="noopener"
+                       class="text-gray-100 text-sm group-hover:text-blue-400 block leading-snug line-clamp-2 transition-colors"
+                       x-text="snippet(post.content, 160) || post.url"></a>
+                  </td>
+
+                  <!-- Date -->
+                  <td class="px-4 py-3 text-gray-500 text-xs whitespace-nowrap tabular-nums" x-text="fmtDate(post.date_iso)"></td>
+
+                  <!-- Impressions with relative bar -->
+                  <td class="px-4 py-3 pr-6">
+                    <div class="flex flex-col items-end gap-1.5">
+                      <span class="text-sm font-semibold text-gray-200 tabular-nums" x-text="fmt(post.impressions)"></span>
+                      <div class="w-16 h-1 bg-gray-800 rounded-full overflow-hidden">
+                        <div class="h-full bg-blue-500/70 rounded-full transition-all duration-500"
+                             :style="`width: ${maxImpressions > 0 ? Math.round((post.impressions / maxImpressions) * 100) : 0}%`"></div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Other metrics -->
+                  <td class="px-4 py-3 text-right text-sm text-gray-400 tabular-nums" x-text="fmt(post.reactions)"></td>
+                  <td class="px-4 py-3 text-right text-sm text-gray-400 tabular-nums" x-text="fmt(post.comments)"></td>
+                  <td class="px-4 py-3 text-right text-sm text-gray-400 tabular-nums" x-text="fmt(post.reposts)"></td>
+
+                  <!-- AI badge → links to internal detail page -->
+                  <td x-show="aiFeedbackEnabled" class="px-4 py-3 text-center">
+                    <a x-show="post.ai_feedback" :href="postDetailUrl(post)"
+                       class="inline-block bg-violet-500/15 text-violet-400 text-xs font-medium px-2 py-0.5 rounded-full hover:bg-violet-500/25 transition-colors">AI</a>
+                    <span x-show="!post.ai_feedback"
+                          class="inline-block text-gray-700 text-xs">—</span>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- end postsTable -->
+  </main>
+</body>
+</html>

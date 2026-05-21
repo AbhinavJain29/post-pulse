@@ -1,0 +1,32 @@
+/* Only what Tailwind can't handle */
+
+[x-cloak] { display: none !important; }
+
+/* Spinner */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner {
+  display: inline-block; width: 14px; height: 14px;
+  border: 2px solid currentColor; border-top-color: transparent;
+  border-radius: 50%; animation: spin .6s linear infinite;
+}
+
+/* Alpine.js panel fade-out transition */
+.panel-fade-leave      { transition: opacity 0.35s ease; }
+.panel-fade-leave-from { opacity: 1; }
+.panel-fade-leave-to   { opacity: 0; }
+
+/* Toggle switch — not achievable with Tailwind utilities alone */
+.toggle { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-track {
+  position: absolute; inset: 0;
+  background: #374151; border-radius: 11px; cursor: pointer;
+  transition: background .2s;
+}
+.toggle-track::after {
+  content: ""; position: absolute;
+  left: 3px; top: 3px; width: 16px; height: 16px;
+  background: #fff; border-radius: 50%; transition: transform .2s;
+}
+.toggle input:checked + .toggle-track { background: #3b82f6; }
+.toggle input:checked + .toggle-track::after { transform: translateX(18px); }
