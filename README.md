@@ -11,7 +11,7 @@ git clone https://github.com/your-username/post-pulse.git
 cd post-pulse
 python -m venv .venv && source .venv/bin/activate
 pip install -e .
-playwright install
+playwright install  # installs browser drivers (separate from the pip package)
 ```
 
 > **Note:** Post Pulse uses your existing Google Chrome installation. Make sure Chrome is installed before running.
@@ -22,15 +22,14 @@ playwright install
 post-pulse
 ```
 
-The app opens at `http://localhost:8080` (tries ports 8080–8084 if 8080 is busy). On first launch it redirects to the Settings page where you can add your Anthropic API key.
+The app opens at `http://localhost:8080` (tries ports 8080–8084 if 8080 is busy).
 
 ## First-time setup
 
-1. Open Settings → paste your [Anthropic API key](https://console.anthropic.com/) → click **Verify & Save**
-2. Toggle **AI Feedback** on or off in Settings
-3. Go to the Dashboard → choose how many posts to fetch → click **Sync Now**
-4. A Chrome window opens — log in to LinkedIn if prompted
-5. Posts and AI feedback appear in the dashboard once the sync completes
+1. Go to the Dashboard → choose how many posts to fetch → click **Sync Now**
+2. A Chrome window opens — log in to LinkedIn if prompted
+3. Posts appear in the dashboard once the sync completes
+
 
 ## CLI usage
 
@@ -55,4 +54,3 @@ Everything lives in `~/.post-pulse/`:
 
 - Python 3.11+
 - Google Chrome (Playwright drives your installed Chrome — not a bundled browser)
-- Anthropic API key (optional — only needed for AI feedback)

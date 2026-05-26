@@ -55,19 +55,19 @@
 
     <!-- Anthropic API Key -->
     <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 mb-4">
-      <h2 class="text-sm font-semibold text-gray-200 mb-1">Anthropic API Key</h2>
-      <p class="text-xs text-gray-500 mb-4">Required for AI feedback on your posts. Leave blank to skip AI analysis.</p>
-      <div class="flex gap-2">
-        <input type="password" x-model="apiKey" placeholder="sk-ant-…"
-               class="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-100 placeholder-gray-600 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-               @keydown.enter="verifyKey()" />
-        <button class="inline-flex items-center gap-2 px-4 py-2 border border-gray-700 bg-gray-800 hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed text-gray-200 text-sm font-medium rounded-lg transition-colors"
-                :disabled="verifying || !apiKey" @click="verifyKey()">
-          <span x-show="verifying" class="spinner"></span>
-          <span x-text="verifying ? 'Verifying…' : 'Verify &amp; Save'"></span>
+      <div class="flex items-center gap-2 mb-1">
+        <h2 class="text-sm font-semibold text-gray-200">Anthropic API Key</h2>
+        <span class="text-xs font-medium text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2 py-0.5 rounded-full">Coming soon</span>
+      </div>
+      <p class="text-xs text-gray-500 mb-4">Required for AI feedback on your posts.</p>
+      <div class="flex gap-2 opacity-40 pointer-events-none">
+        <input type="password" placeholder="sk-ant-…" disabled
+               class="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-100 placeholder-gray-600 outline-none" />
+        <button disabled
+                class="inline-flex items-center gap-2 px-4 py-2 border border-gray-700 bg-gray-800 text-gray-200 text-sm font-medium rounded-lg cursor-not-allowed">
+          Verify &amp; Save
         </button>
       </div>
-      <p class="text-xs text-gray-600 mt-2">Your key is stored locally and never sent anywhere except Anthropic.</p>
     </div>
 
     <!-- Sync Settings -->
@@ -76,11 +76,14 @@
 
       <div class="flex items-center justify-between mb-6 py-4">
         <div>
-          <p class="text-xs font-medium text-gray-400 mb-0.5">AI Feedback</p>
+          <div class="flex items-center gap-2 mb-0.5">
+            <p class="text-xs font-medium text-gray-400">AI Feedback</p>
+            <span class="text-xs font-medium text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2 py-0.5 rounded-full">Coming soon</span>
+          </div>
           <p class="text-xs text-gray-600">Generate Claude AI feedback for each post after syncing.</p>
         </div>
-        <label class="toggle">
-          <input type="checkbox" x-model="aiFeedbackEnabled" />
+        <label class="toggle opacity-40 pointer-events-none">
+          <input type="checkbox" disabled />
           <span class="toggle-track"></span>
         </label>
       </div>
