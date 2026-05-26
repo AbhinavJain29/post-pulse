@@ -9,9 +9,12 @@ Post Pulse is a local LinkedIn post analytics tracker. It scrapes your posts via
 ```bash
 git clone https://github.com/your-username/post-pulse.git
 cd post-pulse
+python -m venv .venv && source .venv/bin/activate
 pip install -e .
-playwright install chromium
+playwright install
 ```
+
+> **Note:** Post Pulse uses your existing Google Chrome installation. Make sure Chrome is installed before running.
 
 ## Run
 
@@ -24,8 +27,8 @@ The app opens at `http://localhost:8080` (tries ports 8080–8084 if 8080 is bus
 ## First-time setup
 
 1. Open Settings → paste your [Anthropic API key](https://console.anthropic.com/) → click **Verify & Save**
-2. Adjust **Posts per sync** (default: 10) and toggle **AI Feedback** on or off
-3. Go to the Dashboard → click **Sync Now**
+2. Toggle **AI Feedback** on or off in Settings
+3. Go to the Dashboard → choose how many posts to fetch → click **Sync Now**
 4. A Chrome window opens — log in to LinkedIn if prompted
 5. Posts and AI feedback appear in the dashboard once the sync completes
 
@@ -51,5 +54,5 @@ Everything lives in `~/.post-pulse/`:
 ## Requirements
 
 - Python 3.11+
-- Google Chrome (used by Playwright for scraping)
+- Google Chrome (Playwright drives your installed Chrome — not a bundled browser)
 - Anthropic API key (optional — only needed for AI feedback)

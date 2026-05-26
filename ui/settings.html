@@ -74,18 +74,7 @@
     <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
       <h2 class="text-sm font-semibold text-gray-200 mb-5">Sync Settings</h2>
 
-      <div class="mb-5">
-        <label class="block text-xs font-medium text-gray-400 mb-1.5">Posts per sync</label>
-        <select x-model.number="scrapeLimit"
-                class="w-28 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-100 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all appearance-none cursor-pointer">
-          <option value="5">5 posts</option>
-          <option value="10">10 posts</option>
-          <option value="20">20 posts</option>
-        </select>
-        <p class="text-xs text-gray-600 mt-1.5">How many LinkedIn posts to fetch each time you sync.</p>
-      </div>
-
-      <div class="flex items-center justify-between mb-6 py-4 border-t border-gray-800">
+      <div class="flex items-center justify-between mb-6 py-4">
         <div>
           <p class="text-xs font-medium text-gray-400 mb-0.5">AI Feedback</p>
           <p class="text-xs text-gray-600">Generate Claude AI feedback for each post after syncing.</p>

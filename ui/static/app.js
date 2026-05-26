@@ -33,6 +33,7 @@ function syncState() {
     events: [],
     count: 0,
     total: 0,
+    scrapeLimit: 10,
     _sse: null,
     _dismissTimer: null,
 
@@ -41,9 +42,27 @@ function syncState() {
       return this.total > 0 ? Math.round((this.count / this.total) * 100) : 0;
     },
 
+    async init() {
+      try {
+        const res = await fetch("/api/settings");
+        if (res.ok) {
+          const data = await res.json();
+          this.scrapeLimit = data.scrape_limit ?? 10;
+        }
+      } catch {}
+    },
+
     async startSync() {
       if (this.isRunning) return;
       if (this._dismissTimer) { clearTimeout(this._dismissTimer); this._dismissTimer = null; }
+
+      // Persist the selected limit before starting
+      await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scrape_limit: this.scrapeLimit }),
+      }).catch(() => {});
+
       this.phase = "waiting";
       this.message = "Starting…";
       this.events = [];
@@ -247,7 +266,6 @@ function postsTable() {
 function settingsForm() {
   return {
     apiKey: "",
-    scrapeLimit: 10,
     aiFeedbackEnabled: false,
     linkedinSessionExpires: null,
     verifying: false,
@@ -261,7 +279,6 @@ function settingsForm() {
         const data = await res.json();
         // Show placeholder text if key is masked; keep field empty so user can re-enter
         this.apiKey = data.anthropic_api_key || "";
-        this.scrapeLimit = data.scrape_limit;
         this.aiFeedbackEnabled = data.ai_feedback_enabled;
         this.linkedinSessionExpires = data.linkedin_session_expires || null;
       } catch {
@@ -304,7 +321,6 @@ function settingsForm() {
       this.alert = null;
       try {
         const payload = {
-          scrape_limit: Number(this.scrapeLimit),
           ai_feedback_enabled: this.aiFeedbackEnabled,
         };
         const res = await fetch("/api/settings", {

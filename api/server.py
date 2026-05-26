@@ -10,7 +10,7 @@ from pathlib import Path
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from core.config import load
-from api.routes import pipeline, posts, reset, settings
+from api.routes import pipeline, posts, reset, settings, stats
 
 app = FastAPI(title="Post Pulse")
 
@@ -28,6 +28,7 @@ app.include_router(pipeline.router)
 app.include_router(posts.router)
 app.include_router(settings.router)
 app.include_router(reset.router)
+app.include_router(stats.router)
 
 _ui_dir = Path(__file__).parent.parent / "ui"
 if _ui_dir.exists():

@@ -10,6 +10,8 @@
   <script>tailwind.config = { theme: { fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] } } }</script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/static/style.css" />
+  <script src="/static/app.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="bg-gray-950 text-gray-100 antialiased font-sans">
 
@@ -53,26 +55,52 @@
   </section>
 
   <!-- Stats preview strip -->
-  <section class="max-w-5xl mx-auto px-6 pb-16">
+  <section class="max-w-5xl mx-auto px-6 pb-16" x-data="landingStats()" x-init="init()">
+    <p class="text-lg text-center text-gray-500 mb-8 leading-relaxed">Sync your posts to see your true numbers</p>
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
       <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
-        <div class="text-2xl font-bold text-white tabular-nums">12.4k</div>
+        <div class="text-2xl font-bold text-white tabular-nums" x-text="impressions">12.4k</div>
         <div class="text-xs text-gray-500 uppercase tracking-wide mt-1">Impressions</div>
       </div>
       <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
-        <div class="text-2xl font-bold text-white tabular-nums">847</div>
+        <div class="text-2xl font-bold text-white tabular-nums" x-text="reactions">847</div>
         <div class="text-xs text-gray-500 uppercase tracking-wide mt-1">Reactions</div>
       </div>
       <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
-        <div class="text-2xl font-bold text-white tabular-nums">134</div>
+        <div class="text-2xl font-bold text-white tabular-nums" x-text="comments">134</div>
         <div class="text-xs text-gray-500 uppercase tracking-wide mt-1">Comments</div>
       </div>
       <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 text-center">
-        <div class="text-2xl font-bold text-violet-400 tabular-nums">AI</div>
-        <div class="text-xs text-gray-500 uppercase tracking-wide mt-1">Feedback</div>
+        <div class="text-2xl font-bold text-blue-400 tabular-nums" x-text="posts">24</div>
+        <div class="text-xs text-gray-500 uppercase tracking-wide mt-1">Posts</div>
       </div>
     </div>
   </section>
+
+  <script>
+    function landingStats() {
+      return {
+        impressions: '12.4k',
+        reactions: '847',
+        comments: '134',
+        posts: '24',
+
+        async init() {
+          try {
+            const res = await fetch('/api/stats');
+            if (!res.ok) return;
+            const data = await res.json();
+            if (data.total_posts > 0) {
+              this.impressions = fmt(data.total_impressions);
+              this.reactions   = fmt(data.total_reactions);
+              this.comments    = fmt(data.total_comments);
+              this.posts       = fmt(data.total_posts);
+            }
+          } catch {}
+        },
+      };
+    }
+  </script>
 
   <!-- How it works -->
   <section class="max-w-5xl mx-auto px-6 pb-20">
