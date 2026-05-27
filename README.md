@@ -27,8 +27,11 @@ pip install -e .
 > **Note:** Post Pulse uses your existing Google Chrome installation. Make sure Chrome is installed before running.
 
 ## Run
+```bash
+post-pulse
+```
 
-Every time you open a new terminal, navigate to the project directory and activate the virtual environment first:
+If you open a new terminal, navigate to the project directory, and activate the virtual environment first:
 
 ```bash
 cd <PATH-TO-CLONED-REPO>/post-pulse
