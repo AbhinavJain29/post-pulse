@@ -7,7 +7,7 @@ Post Pulse is a local LinkedIn post analytics tracker. It scrapes your posts via
 ## Install
 
 ```bash
-git clone https://github.com/your-username/post-pulse.git
+git clone https://github.com/AbhinavJain29/post-pulse.git
 cd post-pulse
 python -m venv .venv && source .venv/bin/activate
 pip install -e .
