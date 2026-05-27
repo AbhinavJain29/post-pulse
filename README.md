@@ -4,21 +4,35 @@ Post Pulse is a local LinkedIn post analytics tracker. It scrapes your posts via
 
 ---
 
+## Requirements
+
+- **Python 3.11+** — check your version with:
+  ```bash
+  python3 --version
+  ```
+  If it's missing or below 3.11, download it from: https://www.python.org/downloads/
+- **Google Chrome** — Playwright drives your installed Chrome, not a bundled browser
+
 ## Install
+
+Do this once after cloning:
 
 ```bash
 git clone https://github.com/AbhinavJain29/post-pulse.git
 cd post-pulse
-python -m venv .venv && source .venv/bin/activate
+python3 -m venv .venv && source .venv/bin/activate
 pip install -e .
-playwright install  # installs browser drivers (separate from the pip package)
 ```
 
 > **Note:** Post Pulse uses your existing Google Chrome installation. Make sure Chrome is installed before running.
 
 ## Run
 
+Every time you open a new terminal, navigate to the project directory and activate the virtual environment first:
+
 ```bash
+cd post-pulse
+source .venv/bin/activate
 post-pulse
 ```
 
@@ -42,8 +56,3 @@ Everything lives in `~/.post-pulse/`:
 
 ### Note: 
 The metrics are pulled once and not on every sync. For the latest posts, you might notice discrepancies in the metrics.
-
-## Requirements
-
-- Python 3.11+
-- Google Chrome (Playwright drives your installed Chrome — not a bundled browser)
