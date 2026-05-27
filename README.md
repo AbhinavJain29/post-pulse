@@ -30,16 +30,6 @@ The app opens at `http://localhost:8080` (tries ports 8080–8084 if 8080 is bus
 2. A Chrome window opens — log in to LinkedIn if prompted
 3. Posts appear in the dashboard once the sync completes
 
-
-## CLI usage
-
-```bash
-python tracker.py                  # scrape with defaults
-python tracker.py --limit 25       # scrape up to 25 posts
-python tracker.py --no-ai          # skip AI feedback
-python tracker.py --reset          # clear all scraped data
-```
-
 ## Data
 
 Everything lives in `~/.post-pulse/`:
@@ -49,6 +39,9 @@ Everything lives in `~/.post-pulse/`:
 | `tracker.db` | SQLite database of posts + AI feedback |
 | `config.json` | Settings (API key, preferences) |
 | `linkedin_cookies.json` | LinkedIn session (auto-managed) |
+
+### Note: 
+The metrics are pulled once and not on every sync. For the latest posts, you might notice discrepancies in the metrics.
 
 ## Requirements
 
