@@ -4,6 +4,12 @@ Post Pulse is a local LinkedIn post analytics tracker. It scrapes your posts via
 
 ---
 
+## Video Demo
+
+[Loom](https://www.loom.com/share/db2972d21ff14f32bfafe9c7931784d7)
+
+---
+
 ## Requirements
 
 - **Python 3.11+** — check your version with:
